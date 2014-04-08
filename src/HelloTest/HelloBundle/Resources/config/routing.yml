@@ -1,0 +1,9 @@
+hello_route:
+    pattern:  /banana
+    defaults: { _controller: HelloTestHelloBundle:Default:cart }
+    requirements:
+        _method : POST
+
+hello_test_hello_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: HelloTestHelloBundle:Default:index }

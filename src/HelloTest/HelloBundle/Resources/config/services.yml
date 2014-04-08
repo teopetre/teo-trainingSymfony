@@ -1,0 +1,18 @@
+parameters:
+#    hello_test_hello.example.class: HelloTest\HelloBundle\Example
+    hello_test_hello.cart_builder.class: HelloTest\HelloBundle\Services\CartBuilder
+    hello_test_hello.cart_handler.class: HelloTest\HelloBundle\Services\CartHandler
+    hello_test_hello.min_cart_total: 100
+
+services:
+#    hello_test_hello.example:
+#        class: %hello_test_hello.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
+
+    hello_test_hello.cart_builder:
+         class: %hello_test_hello.cart_builder.class%
+
+    hello_test_hello.cart_handler:
+         class: %hello_test_hello.cart_handler.class%
+         calls:
+           - [ setMinCartTotal, [ %hello_test_hello.min_cart_total% ] ]

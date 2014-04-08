@@ -1,0 +1,8 @@
+acme_store:
+    resource: "@AcmeStoreBundle/Resources/config/routing.yml"
+    prefix:   /
+
+hello_test_hello:
+    resource: "@HelloTestHelloBundle/Resources/config/routing.yml"
+    prefix:   /
+
