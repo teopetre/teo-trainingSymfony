@@ -1,6 +1,6 @@
 <?php
 
-namespace Acme\StoreBundle\Document;
+namespace Acme\TrainingBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 

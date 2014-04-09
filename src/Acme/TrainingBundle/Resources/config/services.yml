@@ -1,0 +1,9 @@
+parameters:
+    acme_training.mongo_persister.class: Acme\TrainingBundle\Services\MongoPersister
+
+services:
+
+    acme_training.mongo_persister:
+         class: %acme_training.mongo_persister.class%
+         calls:
+            - [setMongoManager, [ @doctrine_mongodb ] ]

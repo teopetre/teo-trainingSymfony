@@ -1,6 +1,6 @@
 <?php
 
-namespace Acme\StoreBundle\Tests\Controller;
+namespace Acme\TrainingBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -22,7 +22,7 @@ class DefaultControllerTest extends WebTestCase
         $kernel->boot();
         $mongoManager = $kernel->getContainer()->get('doctrine_mongodb');
         $repo = $mongoManager->getRepository(
-          'AcmeStoreBundle:Product'
+          'AcmeTrainingBundle:Product'
         );
 
         $products = $repo->findAll();

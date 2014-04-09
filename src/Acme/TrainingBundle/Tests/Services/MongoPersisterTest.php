@@ -1,16 +1,16 @@
 <?php
 
-namespace Acme\StoreBundle\Tests\Services;
+namespace Acme\TrainingBundle\Tests\Services;
 
-use Acme\StoreBundle\Entity\Product;
-use Acme\StoreBundle\Services\MongoPersister;
+use Acme\TrainingBundle\Entity\Product;
+use Acme\TrainingBundle\Services\MongoPersister;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 
 /**
  * Class MongoPersisterTest
- * @package Acme\StoreBundle\Tests\Services
+ * @package Acme\TrainingBundle\Tests\Services
  */
 class MongoPersisterTest extends WebTestCase
 {
@@ -30,7 +30,7 @@ class MongoPersisterTest extends WebTestCase
 
         self::$mongoManager = $kernel->getContainer()->get('doctrine_mongodb');
         self::$repo = self::$mongoManager->getRepository(
-          'AcmeStoreBundle:Product'
+          'AcmeTrainingBundle:Product'
         );
 
         $this->mongoPersister = new MongoPersister();

@@ -6,7 +6,7 @@
  * Time: 12:10 PM
  */
 
-namespace Acme\StoreBundle\Entity;
+namespace Acme\TrainingBundle\Entity;
 
 
 use Doctrine\ORM\Mapping as ORM;

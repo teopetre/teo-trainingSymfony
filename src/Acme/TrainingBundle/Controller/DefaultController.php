@@ -1,20 +1,20 @@
 <?php
 
-namespace Acme\StoreBundle\Controller;
+namespace Acme\TrainingBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class DefaultController
- * @package Acme\StoreBundle\Controller
+ * @package Acme\TrainingBundle\Controller
  */
 class DefaultController extends Controller
 {
     public function indexAction($name)
     {
         return $this->render(
-          'AcmeStoreBundle:Default:index.html.twig',
+          'AcmeTrainingBundle:Default:index.html.twig',
           array('name' => $name)
         );
     }
@@ -26,7 +26,7 @@ class DefaultController extends Controller
     public function createAction()
     {
         $rawProduct = $this->getPostData();
-        $mongoPersister = $this->get('acme_store.mongo_persister');
+        $mongoPersister = $this->get('acme_training.mongo_persister');
         $rawProduct = json_decode($rawProduct, true);
         $product = $mongoPersister->createProduct($rawProduct);
 
@@ -44,7 +44,7 @@ class DefaultController extends Controller
      */
     public function loadByIdAction($id)
     {
-        $mongoPersister = $this->get('acme_store.mongo_persister');
+        $mongoPersister = $this->get('acme_training.mongo_persister');
         try {
             $product = $mongoPersister->loadProductById($id);
         } catch (\Exception $ex) {
@@ -69,7 +69,7 @@ class DefaultController extends Controller
      */
     public function loadByNameAction($name)
     {
-        $mongoPersister = $this->get('acme_store.mongo_persister');
+        $mongoPersister = $this->get('acme_training.mongo_persister');
 
         try {
             $products = $mongoPersister->loadProductByName($name);

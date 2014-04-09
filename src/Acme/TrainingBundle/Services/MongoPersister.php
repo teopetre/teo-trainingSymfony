@@ -1,8 +1,8 @@
 <?php
 
-namespace Acme\StoreBundle\Services;
+namespace Acme\TrainingBundle\Services;
 
-use Acme\StoreBundle\Document\Product;
+use Acme\TrainingBundle\Document\Product;
 use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 
 class MongoPersister
@@ -33,7 +33,7 @@ class MongoPersister
      * @param array $productArray
      *
      * @throws \UnexpectedValueException
-     * @return \Acme\StoreBundle\Document\Product
+     * @return \Acme\TrainingBundle\Document\Product
      */
     public function createProduct(array $productArray)
     {
@@ -64,7 +64,7 @@ class MongoPersister
     public function loadProductByName($name)
     {
         $repository = $this->mongoManager
-          ->getRepository('AcmeStoreBundle:Product');
+          ->getRepository('AcmeTrainingBundle:Product');
         $products = $repository->findByName($name);
 
         if (!$products) {
@@ -84,7 +84,7 @@ class MongoPersister
     public function loadProductById($id)
     {
         $repository = $this->mongoManager
-          ->getRepository('AcmeStoreBundle:Product');
+          ->getRepository('AcmeTrainingBundle:Product');
         $product = $repository->find($id);
 
         if (!$product) {
