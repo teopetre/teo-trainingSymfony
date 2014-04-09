@@ -32,18 +32,19 @@ class MongoPersister
      *
      * @param array $productArray
      *
+     * @throws \UnexpectedValueException
      * @return \Acme\StoreBundle\Document\Product
      */
     public function createProduct(array $productArray)
     {
+        if (empty($productArray['name']) || empty($productArray['price'])) {
+            throw new \UnexpectedValueException ('Both fields are required.');
+        }
+
         // Create the product object.
         $product = new Product();
-        if (isset($productArray['name'])) {
-            $product->setName($productArray['name']);
-        }
-        if (isset($productArray['price'])) {
-            $product->setPrice($productArray['price']);
-        }
+        $product->setName($productArray['name']);
+        $product->setPrice($productArray['price']);
 
         // Persist product to MongoDB.
         $dm = $this->mongoManager->getManager();
@@ -67,7 +68,7 @@ class MongoPersister
         $products = $repository->findByName($name);
 
         if (!$products) {
-            throw new \Exception('No product found for name ' . $name);
+            throw new \Exception('No product found for name "' . $name . '"');
         }
 
         return $products;

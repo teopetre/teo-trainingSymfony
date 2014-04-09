@@ -25,11 +25,15 @@ class DefaultController extends Controller
      */
     public function createAction()
     {
+        $rawProduct = $this->getPostData();
         $mongoPersister = $this->get('acme_store.mongo_persister');
-        $fakeInfo = array('name' => 'nuca', 'price' => 99);
-        $product = $mongoPersister->createProduct($fakeInfo);
+        $rawProduct = json_decode($rawProduct, true);
+        $product = $mongoPersister->createProduct($rawProduct);
 
-        return new Response('Created product id ' . $product->getId());
+        $response = new Response($product->toJson());
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -44,10 +48,16 @@ class DefaultController extends Controller
         try {
             $product = $mongoPersister->loadProductById($id);
         } catch (\Exception $ex) {
-            return new Response($ex->getMessage());
+            $response = new Response(json_encode($ex->getMessage()), 404);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
         }
 
-        return new Response("Product with id $id: " . $product->toString());
+        $response = new Response($product->toJson());
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
     }
 
     /**
@@ -64,16 +74,29 @@ class DefaultController extends Controller
         try {
             $products = $mongoPersister->loadProductByName($name);
         } catch (\Exception $ex) {
-            return new Response($ex->getMessage());
+            $response = new Response(json_encode($ex->getMessage()), 404);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
         }
 
-        $output = 'Products found: <ul>';
+        $productsArray = array();
         foreach ($products as $product) {
-            $output .= '<li>' . $product->toString() . '</li>';
+            $productsArray[] = $product->toArray();
         }
-        $output .= '</ul>';
 
-        return new Response($output);
+        $response = new Response(json_encode($productsArray));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPostData()
+    {
+        return $this->get('request')->getContent();
     }
 
 }

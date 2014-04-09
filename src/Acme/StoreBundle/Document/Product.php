@@ -92,7 +92,20 @@ class Product
         );
     }
 
-    public function toString() {
+    /**
+     * @return string
+     */
+    public function toString()
+    {
         return implode(', ', $this->toArray());
     }
+
+    /**
+     * @return string
+     */
+    public function toJson()
+    {
+        return json_encode($this->toArray());
+    }
+
 }
