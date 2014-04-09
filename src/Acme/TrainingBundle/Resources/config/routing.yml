@@ -1,15 +1,27 @@
 acme_store_homepage:
     pattern:  /hello/{name}
-    defaults: { _controller: AcmeTrainingBundle:Default:index }
+    defaults: { _controller: AcmeTrainingBundle:Mongo:index }
 
-product_create:
-    pattern: /product/create
-    defaults: {_controller: AcmeTrainingBundle:Default:create }
+product_create_mongo:
+    pattern: /product/mongo/create
+    defaults: {_controller: AcmeTrainingBundle:Mongo:create }
 
-product_load:
-    pattern: /product/load-by-name/{name}
-    defaults: {_controller: AcmeTrainingBundle:Default:loadByName }
+product_load_mongo:
+    pattern: /product/mongo/load-by-name/{name}
+    defaults: {_controller: AcmeTrainingBundle:Mongo:loadByName }
 
-product_demo:
-    pattern: /product/load-by-id/{id}
-    defaults: {_controller: AcmeTrainingBundle:Default:loadById }
+product_demo_mongo:
+    pattern: /product/mongo/load-by-id/{id}
+    defaults: {_controller: AcmeTrainingBundle:Mongo:loadById }
+
+product_create_mysql:
+    pattern: /product/mysql/create
+    defaults: {_controller: AcmeTrainingBundle:Mysql:create }
+
+product_load_name_mysql:
+    pattern: /product/mysql/load-by-name/{name}
+    defaults: {_controller: AcmeTrainingBundle:Mysql:loadByName }
+
+product_load_id_mysql:
+    pattern: /product/mysql/load-by-id/{id}
+    defaults: {_controller: AcmeTrainingBundle:Mysql:loadById }

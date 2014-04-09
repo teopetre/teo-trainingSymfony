@@ -6,18 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class DefaultController
+ * Class MongoController
  * @package Acme\TrainingBundle\Controller
  */
-class DefaultController extends Controller
+class MongoController extends Controller
 {
-    public function indexAction($name)
-    {
-        return $this->render(
-          'AcmeTrainingBundle:Default:index.html.twig',
-          array('name' => $name)
-        );
-    }
 
     /**
      * Adds a product to MongoDB.

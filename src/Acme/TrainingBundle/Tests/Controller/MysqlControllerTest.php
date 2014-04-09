@@ -5,7 +5,7 @@ namespace Acme\TrainingBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class DefaultControllerTest extends WebTestCase
+class MysqlControllerTest extends WebTestCase
 {
     /** @var  Client */
     protected $client;
@@ -20,15 +20,15 @@ class DefaultControllerTest extends WebTestCase
         // Delete all items form db.
         $kernel = static::createKernel();
         $kernel->boot();
-        $mongoManager = $kernel->getContainer()->get('doctrine_mongodb');
-        $repo = $mongoManager->getRepository(
+        $entityManager = $kernel->getContainer()->get('doctrine.orm.entity_manager');
+        $repo = $entityManager->getRepository(
           'AcmeTrainingBundle:Product'
         );
 
         $products = $repo->findAll();
         foreach ($products as $product) {
-            $mongoManager->getManager()->remove($product);
-            $mongoManager->getManager()->flush();
+            $entityManager->remove($product);
+            $entityManager->flush();
         }
     }
 
@@ -40,7 +40,7 @@ class DefaultControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'created_item', 'price' => 85));
         $this->client->request(
           'GET',
-          '/product/create',
+          '/product/mysql/create',
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -64,7 +64,7 @@ class DefaultControllerTest extends WebTestCase
      */
     public function testLoadByName()
     {
-        $this->client->request('GET', '/product/load-by-name/created_item');
+        $this->client->request('GET', '/product/mysql/load-by-name/created_item');
         $response = json_decode($this->client->getResponse()->getContent());
         $product = array_pop($response);
         $this->assertEquals('created_item', $product->name);
@@ -73,19 +73,19 @@ class DefaultControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'created_item', 'price' => 45));
         $this->client->request(
           'GET',
-          '/product/create',
+          '/product/mysql/create',
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
           $product
         );
 
-        $this->client->request('GET', '/product/load-by-name/created_item');
+        $this->client->request('GET', '/product/mysql/load-by-name/created_item');
         $response = json_decode($this->client->getResponse()->getContent());
         $this->assertCount(2, $response);
 
         // Check if the right message is returned.
-        $this->client->request('GET', '/product/load-by-name/nono');
+        $this->client->request('GET', '/product/mysql/load-by-name/nono');
         $response_code = json_decode(
           $this->client->getResponse()->getStatusCode()
         );
@@ -100,7 +100,7 @@ class DefaultControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'test1234584', 'price' => 85));
         $this->client->request(
           'GET',
-          '/product/create',
+          '/product/mysql/create',
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -113,13 +113,13 @@ class DefaultControllerTest extends WebTestCase
 
         $this->client->request(
           'GET',
-          '/product/load-by-id/' . $expected_value->id
+          '/product/mysql/load-by-id/' . $expected_value->id
         );
         $actual_value = json_decode($this->client->getResponse()->getContent());
 
         $this->assertEquals($expected_value, $actual_value);
 
-        $this->client->request('GET', '/product/load-by-id/nono');
+        $this->client->request('GET', '/product/mysql/load-by-id/nono');
         $response_code = json_decode(
           $this->client->getResponse()->getStatusCode()
         );

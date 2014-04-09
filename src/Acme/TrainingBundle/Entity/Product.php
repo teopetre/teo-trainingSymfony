@@ -35,11 +35,6 @@ class Product
     protected $price;
 
     /**
-     * @ORM\Column(type="text")
-     */
-    protected $description;
-
-    /**
      * Get id
      *
      * @return integer 
@@ -96,25 +91,22 @@ class Product
     }
 
     /**
-     * Set description
-     *
-     * @param string $description
-     * @return Product
+     * @return array
      */
-    public function setDescription($description)
+    public function toArray()
     {
-        $this->description = $description;
-
-        return $this;
+        return array(
+          'id' => $this->id,
+          'name' => $this->name,
+          'price' => $this->price,
+        );
     }
 
     /**
-     * Get description
-     *
-     * @return string 
+     * @return string
      */
-    public function getDescription()
+    public function toJson()
     {
-        return $this->description;
+        return json_encode($this->toArray());
     }
 }
