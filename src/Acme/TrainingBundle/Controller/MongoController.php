@@ -94,10 +94,10 @@ class MongoController extends Controller
     {
         $filters = $this->getPostData();
         $mongoPersister = $this->get('acme_training.mongo_persister');
-        $rawProduct = json_decode($filters, true);
+        $filters = json_decode($filters, true);
 
         try {
-            $products = $mongoPersister->filter($rawProduct);
+            $products = $mongoPersister->filter($filters);
         } catch (\Exception $e) {
             $status = ($e instanceof FiltersException) ? 400 : 404;
             $response = new Response(json_encode($e->getMessage()), $status);

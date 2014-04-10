@@ -2,24 +2,24 @@
 
 namespace Acme\TrainingBundle\Tests\Services;
 
-use Acme\TrainingBundle\Services\MongoPersister;
-use Doctrine\ODM\MongoDB\DocumentRepository;
+use Acme\TrainingBundle\Services\Persister;
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 
 /**
- * Class MongoPersisterTest
+ * Class PersisterTest
  * @package Acme\TrainingBundle\Tests\Services
  */
 class MongoPersisterTest extends WebTestCase
 {
-    /** @var MongoPersister */
-    private $mongoPersister;
+    /** @var  Persister */
+    protected $persister;
 
-    /** @var ManagerRegistry */
-    protected static $mongoManager;
+    /** @var  ObjectManager */
+    protected static $objectManager;
 
-    /** @var  DocumentRepository */
+    /** @var  ObjectRepository */
     protected static $repo;
 
     public function setUp()
@@ -27,13 +27,13 @@ class MongoPersisterTest extends WebTestCase
         $kernel = static::createKernel();
         $kernel->boot();
 
-        self::$mongoManager = $kernel->getContainer()->get('doctrine_mongodb');
-        self::$repo = self::$mongoManager->getRepository(
+        self::$objectManager = $kernel->getContainer()->get('doctrine_mongodb')->getManager();
+        self::$repo = self::$objectManager->getRepository(
           'AcmeTrainingBundle:Product'
         );
 
-        $this->mongoPersister = new MongoPersister();
-        $this->mongoPersister->setMongoManager(self::$mongoManager);
+        $this->persister = new Persister();
+        $this->persister->setObjectManager(self::$objectManager);
     }
 
     public static function tearDownAfterClass()
@@ -41,17 +41,17 @@ class MongoPersisterTest extends WebTestCase
         // Delete all items form db.
         $products = self::$repo->findAll();
         foreach ($products as $product) {
-            self::$mongoManager->getManager()->remove($product);
-            self::$mongoManager->getManager()->flush();
+            self::$objectManager->remove($product);
+            self::$objectManager->flush();
         }
     }
 
     /**
-     * Validates the method that saves an object into a mongo document.
+     * Validates the method that saves an object into db.
      */
     public function testCreate()
     {
-        $product = $this->mongoPersister->createProduct(
+        $product = $this->persister->createProduct(
           array('name' => 'item1', 'price' => 54)
         );
         $this->assertEquals(54, $product->getPrice());
@@ -63,7 +63,7 @@ class MongoPersisterTest extends WebTestCase
      */
     public function testCreateException()
     {
-        $this->mongoPersister->createProduct(
+        $this->persister->createProduct(
           array('name' => '', 'price' => 54)
         );
     }
@@ -73,33 +73,32 @@ class MongoPersisterTest extends WebTestCase
      */
     public function testCreateException2()
     {
-        $this->mongoPersister->createProduct(
+        $this->persister->createProduct(
           array('name' => '', 54)
         );
     }
 
     /**
-     * Validates the method that loads and object from a mongo document, by id.
+     * Validates the method that loads and object from db, by id.
      *
      * @expectedException \Exception
      */
     public function testLoadById()
     {
-        $product = $this->mongoPersister->createProduct(
+        $product = $this->persister->createProduct(
           array('name' => 'item1', 'price' => 65)
         );
         $this->assertEquals(
           $product,
-          $this->mongoPersister->loadProductById($product->getId())
+          $this->persister->loadProductById($product->getId())
         );
 
         // This should throw Exception.
-        $this->mongoPersister->loadProductById('1teo234');
+        $this->persister->loadProductById('1teo234');
     }
 
     /**
-     * Validates the method that loads a list of objects from a mongo db, by
-     * name.
+     * Validates the method that loads a list of objects from db, by name.
      *
      * @expectedException \Exception
      */
@@ -108,19 +107,19 @@ class MongoPersisterTest extends WebTestCase
         // Check if there are 2 items "item1" created in previous tests.
         $this->assertCount(
           2,
-          $this->mongoPersister->loadProductByName('item1')
+          $this->persister->loadProductByName('item1')
         );
 
         // Create new product and search for it.
-        $product = $this->mongoPersister->createProduct(
+        $product = $this->persister->createProduct(
           array('name' => 'item2', 'price' => 100)
         );
-        $products = $this->mongoPersister->loadProductByName('item2');
+        $products = $this->persister->loadProductByName('item2');
         $actual_product = array_pop($products);
         $this->assertEquals($product, $actual_product);
 
         // Search for an non-existent item.
-        $this->mongoPersister->loadProductByName('item3');
+        $this->persister->loadProductByName('item3');
     }
 
 }

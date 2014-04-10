@@ -214,7 +214,9 @@ class MongoControllerTest extends WebTestCase
         );
 
         $response = json_decode($this->client->getResponse()->getContent());
-        $response_code = json_decode($this->client->getResponse()->getStatusCode());
+        $response_code = json_decode(
+          $this->client->getResponse()->getStatusCode()
+        );
         $this->assertEquals('No products found.', $response);
         $this->assertEquals(404, $response_code);
     }

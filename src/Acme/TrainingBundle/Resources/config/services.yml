@@ -1,15 +1,14 @@
 parameters:
-    acme_training.mongo_persister.class: Acme\TrainingBundle\Services\MongoPersister
-    acme_training.mysql_persister.class: Acme\TrainingBundle\Services\MysqlPersister
+    acme_training.persister.class: Acme\TrainingBundle\Services\Persister
 
 services:
 
     acme_training.mongo_persister:
-         class: %acme_training.mongo_persister.class%
+         class: %acme_training.persister.class%
          calls:
-            - [setMongoManager, [ @doctrine_mongodb ] ]
+            - [setObjectManager, [ @doctrine_mongodb.odm.document_manager ] ]
 
     acme_training.mysql_persister:
-         class: %acme_training.mysql_persister.class%
+         class: %acme_training.persister.class%
          calls:
-            - [setEntityManager, [ @doctrine.orm.entity_manager ] ]
+            - [setObjectManager, [ @doctrine.orm.entity_manager ] ]

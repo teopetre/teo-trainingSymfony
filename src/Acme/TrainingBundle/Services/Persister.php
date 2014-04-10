@@ -2,34 +2,33 @@
 
 namespace Acme\TrainingBundle\Services;
 
-use Acme\TrainingBundle\Document\Product;
-use Doctrine\Bundle\MongoDBBundle\ManagerRegistry;
 use Acme\TrainingBundle\Exception\FiltersException;
+use Doctrine\Common\Persistence\ObjectManager;
+use Exception;
 
-class MongoPersister
+class Persister
 {
-
-    /** @var ManagerRegistry */
-    protected $mongoManager;
+    /** @var ObjectManager */
+    protected $objectManager;
 
     /**
-     * @param \Doctrine\Bundle\MongoDBBundle\ManagerRegistry $mongoManager
+     * @param $objectManager
      */
-    public function setMongoManager($mongoManager)
+    public function setObjectManager($objectManager)
     {
-        $this->mongoManager = $mongoManager;
+        $this->objectManager = $objectManager;
     }
 
     /**
-     * @return \Doctrine\Bundle\MongoDBBundle\ManagerRegistry
+     * @return ObjectManager
      */
-    public function getMongoManager()
+    public function getEntityManager()
     {
-        return $this->mongoManager;
+        return $this->objectManager;
     }
 
     /**
-     * Adds a new product to MongoDB.
+     * Adds a new product to database.
      *
      * @param array $productArray
      *
@@ -42,15 +41,20 @@ class MongoPersister
             throw new \UnexpectedValueException ('Both fields are required.');
         }
 
+        // Get the right class name of object managed by the repository
+        // depending on database used.
+        $productClassName = $this->getEntityManager()->getRepository(
+          'AcmeTrainingBundle:Product'
+        )->getClassName();
+
         // Create the product object.
-        $product = new Product();
+        $product = new $productClassName();
         $product->setName($productArray['name']);
         $product->setPrice($productArray['price']);
 
         // Persist product to MongoDB.
-        $dm = $this->mongoManager->getManager();
-        $dm->persist($product);
-        $dm->flush();
+        $this->objectManager->persist($product);
+        $this->objectManager->flush();
 
         return $product;
     }
@@ -60,16 +64,17 @@ class MongoPersister
      *
      * @param $name
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadProductByName($name)
     {
-        $repository = $this->mongoManager
-          ->getRepository('AcmeTrainingBundle:Product');
+        $repository = $this->objectManager->getRepository(
+          'AcmeTrainingBundle:Product'
+        );
         $products = $repository->findByName($name);
 
         if (!$products) {
-            throw new \Exception('No product found for name "' . $name . '"');
+            throw new Exception('No product found for name "' . $name . '"');
         }
 
         return $products;
@@ -78,18 +83,16 @@ class MongoPersister
     /**
      * Loads product by id.
      *
-     * @param $id
-     * @return Product
-     * @throws \Exception
+     * @throws Exception
      */
     public function loadProductById($id)
     {
-        $repository = $this->mongoManager
+        $repository = $this->objectManager
           ->getRepository('AcmeTrainingBundle:Product');
         $product = $repository->find($id);
 
         if (!$product) {
-            throw new \Exception('No product found for id ' . $id);
+            throw new Exception('No product found for id ' . $id);
         }
 
         return $product;
@@ -103,17 +106,21 @@ class MongoPersister
      *   'filter_name' => 'filter_value'
      *
      * @return \Acme\TrainingBundle\Document\Product[]|array
-     * @throws \Acme\TrainingBundle\Exception\FiltersException
-     * @throws \Exception
+     * @throws FiltersException
+     * @throws Exception
      */
     public function filter($filters)
     {
-        $repository = $this->mongoManager->getRepository(
+        $repository = $this->objectManager->getRepository(
           'AcmeTrainingBundle:Product'
         );
 
-        // Check if the right filters was sent.
-        if (array_diff(array_keys($filters), array('name', 'price'))) {
+        // Check if the right filters w as sent.
+        if (!is_array($filters) || array_diff(
+            array_keys($filters),
+            array('name', 'price')
+          )
+        ) {
             throw new FiltersException('Wrong filters sent');
         }
 
@@ -126,7 +133,7 @@ class MongoPersister
 
         $products = $repository->findBy($filters);
         if (empty($products)) {
-            throw new \Exception('No products found.');
+            throw new Exception('No products found.');
         }
 
         return $products;
