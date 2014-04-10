@@ -59,7 +59,7 @@ class MongoPersisterTest extends WebTestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
      */
     public function testCreateException()
     {
@@ -69,7 +69,7 @@ class MongoPersisterTest extends WebTestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
      */
     public function testCreateException2()
     {
@@ -81,7 +81,7 @@ class MongoPersisterTest extends WebTestCase
     /**
      * Validates the method that loads and object from a mongo document, by id.
      *
-     * @expectedException Exception
+     * @expectedException \Exception
      */
     public function testLoadById()
     {
@@ -101,7 +101,7 @@ class MongoPersisterTest extends WebTestCase
      * Validates the method that loads a list of objects from a mongo db, by
      * name.
      *
-     * @expectedException Exception
+     * @expectedException \Exception
      */
     public function testLoadByName()
     {

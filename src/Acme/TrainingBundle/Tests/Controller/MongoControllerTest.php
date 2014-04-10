@@ -64,7 +64,10 @@ class MongoControllerTest extends WebTestCase
      */
     public function testLoadByName()
     {
-        $this->client->request('GET', '/product/mongo/load-by-name/created_item');
+        $this->client->request(
+          'GET',
+          '/product/mongo/load-by-name/created_item'
+        );
         $response = json_decode($this->client->getResponse()->getContent());
         $product = array_pop($response);
         $this->assertEquals('created_item', $product->name);
@@ -80,7 +83,10 @@ class MongoControllerTest extends WebTestCase
           $product
         );
 
-        $this->client->request('GET', '/product/mongo/load-by-name/created_item');
+        $this->client->request(
+          'GET',
+          '/product/mongo/load-by-name/created_item'
+        );
         $response = json_decode($this->client->getResponse()->getContent());
         $this->assertCount(2, $response);
 
@@ -126,4 +132,90 @@ class MongoControllerTest extends WebTestCase
         $this->assertEquals(404, $response_code);
     }
 
+    /**
+     * Functional test for Filter method.
+     */
+    public function testFilter()
+    {
+        // Check empty filters response.
+        $filters = json_encode(array('name' => '', 'price' => 56));
+        $this->client->request(
+          'POST',
+          '/product/mongo/filter',
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json'),
+          $filters
+        );
+
+        $response_code = json_decode(
+          $this->client->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(400, $response_code);
+
+        // Check wrong filters response.
+        $filters = json_encode(array('another_filter' => 50));
+        $this->client->request(
+          'POST',
+          '/product/mongo/filter',
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json'),
+          $filters
+        );
+
+        $response = json_decode(
+          $this->client->getResponse()->getContent()
+        );
+        $response_code = json_decode(
+          $this->client->getResponse()->getStatusCode()
+        );
+        $this->assertEquals(400, $response_code);
+        $this->assertEquals('Wrong filters sent', $response);
+
+        // Filter by price.
+        $filters = json_encode(array('price' => 85));
+        $this->client->request(
+          'POST',
+          '/product/mongo/filter',
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json'),
+          $filters
+        );
+
+        $response = json_decode($this->client->getResponse()->getContent());
+        $this->assertCount(2, $response);
+
+        // Filter by price and name.
+        $filters = json_encode(array('name' => 'created_item', 'price' => 85));
+        $this->client->request(
+          'POST',
+          '/product/mongo/filter',
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json'),
+          $filters
+        );
+
+        $response = json_decode($this->client->getResponse()->getContent());
+        $product = array_pop($response);
+        $this->assertEquals('created_item', $product->name);
+
+        // Filter by criteria that certainly won't match.
+        $filters = json_encode(array('price' => 0));
+        $this->client->request(
+          'POST',
+          '/product/mongo/filter',
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json'),
+          $filters
+        );
+
+        $response = json_decode($this->client->getResponse()->getContent());
+        $response_code = json_decode($this->client->getResponse()->getStatusCode());
+        $this->assertEquals('No products found.', $response);
+        $this->assertEquals(404, $response_code);
+    }
 }

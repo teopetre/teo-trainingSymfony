@@ -2,6 +2,7 @@
 
 namespace Acme\TrainingBundle\Controller;
 
+use Acme\TrainingBundle\Exception\FiltersException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -68,6 +69,38 @@ class MongoController extends Controller
             $products = $mongoPersister->loadProductByName($name);
         } catch (\Exception $ex) {
             $response = new Response(json_encode($ex->getMessage()), 404);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        }
+
+        $productsArray = array();
+        foreach ($products as $product) {
+            $productsArray[] = $product->toArray();
+        }
+
+        $response = new Response(json_encode($productsArray));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * Loads a list of products by some filters.
+     *
+     * @return Response
+     */
+    public function filterAction()
+    {
+        $filters = $this->getPostData();
+        $mongoPersister = $this->get('acme_training.mongo_persister');
+        $rawProduct = json_decode($filters, true);
+
+        try {
+            $products = $mongoPersister->filter($rawProduct);
+        } catch (\Exception $e) {
+            $status = ($e instanceof FiltersException) ? 400 : 404;
+            $response = new Response(json_encode($e->getMessage()), $status);
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;

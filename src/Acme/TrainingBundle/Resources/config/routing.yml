@@ -25,3 +25,10 @@ product_load_name_mysql:
 product_load_id_mysql:
     pattern: /product/mysql/load-by-id/{id}
     defaults: {_controller: AcmeTrainingBundle:Mysql:loadById }
+
+product_fitler_mongo:
+    pattern: /product/mongo/filter
+    defaults: {_controller: AcmeTrainingBundle:Mongo:filter}
+    requirements:
+            _method : POST
+
