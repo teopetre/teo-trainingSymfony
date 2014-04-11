@@ -6,4 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Misd\\GuzzleBundle\\' => array($vendorDir . '/misd/guzzle-bundle'),
 );

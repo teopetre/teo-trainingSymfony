@@ -19,6 +19,8 @@ class AppKernel extends Kernel
             new HelloTest\HelloBundle\HelloTestHelloBundle(),
             new Acme\TrainingBundle\AcmeTrainingBundle(),
             new Doctrine\Bundle\MongoDBBundle\DoctrineMongoDBBundle(),
+            new JMS\SerializerBundle\JMSSerializerBundle(),
+            new Misd\GuzzleBundle\MisdGuzzleBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test'))) {
