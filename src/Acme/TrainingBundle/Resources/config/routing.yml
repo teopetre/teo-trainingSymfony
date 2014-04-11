@@ -32,3 +32,9 @@ product_fitler_mongo:
     requirements:
             _method : POST
 
+product_fitler_mysql:
+    pattern: /product/mysql/filter
+    defaults: {_controller: AcmeTrainingBundle:Mysql:filter}
+    requirements:
+            _method : POST
+

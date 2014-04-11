@@ -27,7 +27,9 @@ class MongoPersisterTest extends WebTestCase
         $kernel = static::createKernel();
         $kernel->boot();
 
-        self::$objectManager = $kernel->getContainer()->get('doctrine_mongodb')->getManager();
+        self::$objectManager = $kernel->getContainer()
+          ->get('doctrine_mongodb')
+          ->getManager();
         self::$repo = self::$objectManager->getRepository(
           'AcmeTrainingBundle:Product'
         );

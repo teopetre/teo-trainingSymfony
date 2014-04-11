@@ -2,6 +2,8 @@
 
 namespace Acme\TrainingBundle\Tests\Controller;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ObjectRepository;
 use Symfony\Bundle\FrameworkBundle\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -10,25 +12,37 @@ class MongoControllerTest extends WebTestCase
     /** @var  Client */
     protected $client;
 
+    /** @var  string */
+    protected $route;
+
+    /** @var  ObjectRepository */
+    protected static $repo;
+
+    /** @var  ObjectManager */
+    protected static $objectManager;
+
     public function setUp()
     {
         $this->client = static::createClient();
+        $this->route = '/product/mongo';
+
+        $kernel = static::createKernel();
+        $kernel->boot();
+        self::$objectManager = $kernel->getContainer()
+          ->get('doctrine_mongodb')
+          ->getManager();
+        self::$repo = self::$objectManager->getRepository(
+          'AcmeTrainingBundle:Product'
+        );
     }
 
     public static function tearDownAfterClass()
     {
         // Delete all items form db.
-        $kernel = static::createKernel();
-        $kernel->boot();
-        $mongoManager = $kernel->getContainer()->get('doctrine_mongodb');
-        $repo = $mongoManager->getRepository(
-          'AcmeTrainingBundle:Product'
-        );
-
-        $products = $repo->findAll();
+        $products = self::$repo->findAll();
         foreach ($products as $product) {
-            $mongoManager->getManager()->remove($product);
-            $mongoManager->getManager()->flush();
+            self::$objectManager->remove($product);
+            self::$objectManager->flush();
         }
     }
 
@@ -40,7 +54,7 @@ class MongoControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'created_item', 'price' => 85));
         $this->client->request(
           'GET',
-          '/product/mongo/create',
+          "$this->route/create",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -66,7 +80,7 @@ class MongoControllerTest extends WebTestCase
     {
         $this->client->request(
           'GET',
-          '/product/mongo/load-by-name/created_item'
+          "$this->route/load-by-name/created_item"
         );
         $response = json_decode($this->client->getResponse()->getContent());
         $product = array_pop($response);
@@ -76,7 +90,7 @@ class MongoControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'created_item', 'price' => 45));
         $this->client->request(
           'GET',
-          '/product/mongo/create',
+          "$this->route/create",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -85,13 +99,13 @@ class MongoControllerTest extends WebTestCase
 
         $this->client->request(
           'GET',
-          '/product/mongo/load-by-name/created_item'
+          "$this->route/load-by-name/created_item"
         );
         $response = json_decode($this->client->getResponse()->getContent());
         $this->assertCount(2, $response);
 
         // Check if the right message is returned.
-        $this->client->request('GET', '/product/mongo/load-by-name/nono');
+        $this->client->request('GET', "$this->route/load-by-name/nono");
         $response_code = json_decode(
           $this->client->getResponse()->getStatusCode()
         );
@@ -106,7 +120,7 @@ class MongoControllerTest extends WebTestCase
         $product = json_encode(array('name' => 'test1234584', 'price' => 85));
         $this->client->request(
           'GET',
-          '/product/mongo/create',
+          "$this->route/create",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -119,13 +133,13 @@ class MongoControllerTest extends WebTestCase
 
         $this->client->request(
           'GET',
-          '/product/mongo/load-by-id/' . $expected_value->id
+          "$this->route/load-by-id/$expected_value->id"
         );
         $actual_value = json_decode($this->client->getResponse()->getContent());
 
         $this->assertEquals($expected_value, $actual_value);
 
-        $this->client->request('GET', '/product/mongo/load-by-id/nono');
+        $this->client->request('GET', "$this->route/load-by-id/nono");
         $response_code = json_decode(
           $this->client->getResponse()->getStatusCode()
         );
@@ -141,7 +155,7 @@ class MongoControllerTest extends WebTestCase
         $filters = json_encode(array('name' => '', 'price' => 56));
         $this->client->request(
           'POST',
-          '/product/mongo/filter',
+          "$this->route/filter",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -157,7 +171,7 @@ class MongoControllerTest extends WebTestCase
         $filters = json_encode(array('another_filter' => 50));
         $this->client->request(
           'POST',
-          '/product/mongo/filter',
+          "$this->route/filter",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -177,7 +191,7 @@ class MongoControllerTest extends WebTestCase
         $filters = json_encode(array('price' => 85));
         $this->client->request(
           'POST',
-          '/product/mongo/filter',
+          "$this->route/filter",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -191,7 +205,7 @@ class MongoControllerTest extends WebTestCase
         $filters = json_encode(array('name' => 'created_item', 'price' => 85));
         $this->client->request(
           'POST',
-          '/product/mongo/filter',
+          "$this->route/filter",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),
@@ -206,7 +220,7 @@ class MongoControllerTest extends WebTestCase
         $filters = json_encode(array('price' => 0));
         $this->client->request(
           'POST',
-          '/product/mongo/filter',
+          "$this->route/filter",
           array(),
           array(),
           array('CONTENT_TYPE' => 'application/json'),

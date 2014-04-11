@@ -2,6 +2,7 @@
 
 namespace Acme\TrainingBundle\Controller;
 
+use Acme\TrainingBundle\Exception\FiltersException;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -69,6 +70,37 @@ class MysqlController extends Controller
             $products = $persister->loadProductByName($name);
         } catch (\Exception $ex) {
             $response = new Response(json_encode($ex->getMessage()), 404);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        }
+
+        $productsArray = array();
+        foreach ($products as $product) {
+            $productsArray[] = $product->toArray();
+        }
+
+        $response = new Response(json_encode($productsArray));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * Loads a list of products by filters sent.
+     *
+     * @return Response
+     */
+    public function filterAction() {
+        $filters = $this->getPostData();
+        $persister = $this->get('acme_training.mysql_persister');
+        $filters = json_decode($filters, true);
+
+        try {
+            $products = $persister->filter($filters);
+        } catch (\Exception $e) {
+            $status = ($e instanceof FiltersException) ? 400 : 404;
+            $response = new Response(json_encode($e->getMessage()), $status);
             $response->headers->set('Content-Type', 'application/json');
 
             return $response;
