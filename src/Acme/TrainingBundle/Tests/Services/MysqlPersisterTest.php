@@ -2,11 +2,7 @@
 
 namespace Acme\TrainingBundle\Tests\Services;
 
-use Acme\TrainingBundle\Services\MysqlPersister;
 use Acme\TrainingBundle\Services\Persister;
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
  * Class MysqlPersisterTest

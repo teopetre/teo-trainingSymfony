@@ -124,5 +124,70 @@ class MongoPersisterTest extends WebTestCase
         $this->persister->loadProductByName('item3');
     }
 
+    /**
+     * @expectedException \Acme\TrainingBundle\Exception\FiltersException
+     * @expectedExceptionMessage Wrong filters sent.
+     */
+    public function testFilter1()
+    {
+        $filters = array(
+          'wrong_filter' => '',
+          'wrong_filter2' => 500,
+          'wrong_filter3' => 'yuhu',
+        );
+
+        $this->persister->filter($filters);
+    }
+
+    /**
+     * @expectedException \Acme\TrainingBundle\Exception\FiltersException
+     * @expectedExceptionMessage Filters are empty.
+     */
+    public function testFilter2()
+    {
+        $filters = array(
+          'name' => '',
+          'price' => 58,
+        );
+
+        $this->persister->filter($filters);
+    }
+
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage No products found.
+     */
+    public function testFilter3()
+    {
+        $filters = array(
+          'name' => 'item123',
+          'price' => 0,
+        );
+
+        $this->persister->filter($filters);
+    }
+
+    /**
+     * Validates the products filter method.
+     */
+    public function testFilter4()
+    {
+        // Filter by name.
+        $filters = array('name' => 'item1');
+        $this->assertCount(2, $this->persister->filter($filters));
+
+        // Filter by name and price.
+        $filters += array('price' => 54);
+        $this->assertCount(1, $this->persister->filter($filters));
+
+        $filters = array('price' => 100);
+        $products = $this->persister->filter($filters);
+        $product = array_pop($products);
+        $this->assertEquals('item2', $product->getName());
+
+        // No filters - should return entire list of products.
+        $this->assertCount(count(self::$repo->findAll()), $this->persister->filter(array()));
+    }
+
 }
  

@@ -94,7 +94,7 @@ class MongoController extends Controller
     {
         $filters = $this->getPostData();
         $mongoPersister = $this->get('acme_training.mongo_persister');
-        $filters = json_decode($filters, true);
+        $filters = $filters ? json_decode($filters, true) : array();
 
         try {
             $products = $mongoPersister->filter($filters);

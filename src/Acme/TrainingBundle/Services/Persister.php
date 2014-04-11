@@ -114,14 +114,17 @@ class Persister
         $repository = $this->objectManager->getRepository(
           'AcmeTrainingBundle:Product'
         );
+        if (!$filters) {
+            return $repository->findAll();
+        }
 
-        // Check if the right filters w as sent.
+        // Check if the right filters was sent.
         if (!is_array($filters) || array_diff(
             array_keys($filters),
             array('name', 'price')
           )
         ) {
-            throw new FiltersException('Wrong filters sent');
+            throw new FiltersException('Wrong filters sent.');
         }
 
         // Check if filters are empty.

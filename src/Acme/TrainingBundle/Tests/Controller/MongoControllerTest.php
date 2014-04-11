@@ -185,7 +185,7 @@ class MongoControllerTest extends WebTestCase
           $this->client->getResponse()->getStatusCode()
         );
         $this->assertEquals(400, $response_code);
-        $this->assertEquals('Wrong filters sent', $response);
+        $this->assertEquals('Wrong filters sent.', $response);
 
         // Filter by price.
         $filters = json_encode(array('price' => 85));
@@ -233,5 +233,17 @@ class MongoControllerTest extends WebTestCase
         );
         $this->assertEquals('No products found.', $response);
         $this->assertEquals(404, $response_code);
+
+        // No filters - should return entire list of products.
+        $this->client->request(
+          'POST',
+          "$this->route/filter",
+          array(),
+          array(),
+          array('CONTENT_TYPE' => 'application/json')
+        );
+
+        $response = json_decode($this->client->getResponse()->getContent());
+        $this->assertCount(count(self::$repo->findAll()), $response);
     }
 }

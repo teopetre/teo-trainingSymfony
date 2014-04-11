@@ -91,10 +91,11 @@ class MysqlController extends Controller
      *
      * @return Response
      */
-    public function filterAction() {
+    public function filterAction()
+    {
         $filters = $this->getPostData();
         $persister = $this->get('acme_training.mysql_persister');
-        $filters = json_decode($filters, true);
+        $filters = $filters ? json_decode($filters, true) : array();
 
         try {
             $products = $persister->filter($filters);
