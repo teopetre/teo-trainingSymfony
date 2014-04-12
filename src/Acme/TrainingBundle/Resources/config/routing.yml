@@ -38,3 +38,6 @@ product_fitler_mysql:
     requirements:
             _method : POST
 
+training_customer_role:
+    pattern: /customer-role
+    defaults: {_controller: AcmeTrainingBundle:Default:index}

@@ -1,5 +1,6 @@
 parameters:
     acme_training.persister.class: Acme\TrainingBundle\Services\Persister
+    acme_training.customer_role_handler.class: Acme\TrainingBundle\Services\CustomerRoleHandler
 
 services:
 
@@ -12,3 +13,8 @@ services:
          class: %acme_training.persister.class%
          calls:
             - [setObjectManager, [ @doctrine.orm.entity_manager ] ]
+
+    acme_training.customer_role_handler:
+         class: %acme_training.customer_role_handler.class%
+         calls:
+            - [setSerializer, [@jms_serializer]]
